@@ -39,6 +39,7 @@ trait ScreenSaver {
 
 pub struct Awake {
     options: Builder,
+    pid: u32,
 
     session_conn: Option<Connection>,
     screensaver_proxy: Option<ScreenSaverProxyBlocking<'static>>,
@@ -54,6 +55,7 @@ impl Awake {
     pub fn new(options: Builder) -> Result<Self> {
         let mut awake = Awake {
             options,
+            pid: std::process::id(),
 
             session_conn: None,
             screensaver_proxy: None,
@@ -117,6 +119,9 @@ impl Awake {
 
 impl Drop for Awake {
     fn drop(&mut self) {
+        if std::process::id() != self.pid {
+            return;
+        }
         if self.options.display {
             if let (Some(p), Some(cookie)) = (self.screensaver_proxy.as_ref(), self.cookie) {
                 p.un_inhibit(cookie).unwrap()

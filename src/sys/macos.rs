@@ -24,6 +24,7 @@ const kIOPMAssertionTypePreventSystemSleep: &str = "PreventSystemSleep";
 
 pub struct Awake {
     options: Builder,
+    pid: u32,
 
     display_assertion: u32,
     idle_assertion: u32,
@@ -34,6 +35,7 @@ impl Awake {
     pub fn new(options: Builder) -> Result<Self> {
         let mut awake = Awake {
             options,
+            pid: std::process::id(),
             display_assertion: 0,
             idle_assertion: 0,
             sleep_assertion: 0,
@@ -99,6 +101,9 @@ impl Awake {
 
 impl Drop for Awake {
     fn drop(&mut self) {
+        if std::process::id() != self.pid {
+            return;
+        }
         if self.display_assertion != 0 {
             unsafe {
                 IOPMAssertionRelease(self.display_assertion);

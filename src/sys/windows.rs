@@ -18,6 +18,7 @@ use crate::Builder;
 
 pub struct Awake {
     options: Builder,
+    pid: u32,
     previous: EXECUTION_STATE,
 }
 
@@ -25,6 +26,7 @@ impl Awake {
     pub fn new(options: Builder) -> Result<Self> {
         let mut awake = Awake {
             options,
+            pid: std::process::id(),
             previous: Default::default(),
         };
         awake.set()?;
@@ -59,6 +61,9 @@ impl Awake {
 
 impl Drop for Awake {
     fn drop(&mut self) {
+        if std::process::id() != self.pid {
+            return;
+        }
         unsafe {
             SetThreadExecutionState(self.previous);
         }
