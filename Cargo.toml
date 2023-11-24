@@ -22,7 +22,8 @@ clap = { version = "4.3", features = ["derive"], optional = true }
 clap_complete = { version = "4.3", optional = true }
 ctrlc = { version = "3.4", features = ["termination"], optional = true }
 shadow-rs = { version = "0.21", optional = true }
-sysinfo = { version = "0.29", optional = true }
+# crash, versions >= 0.29.1 are affected by #GuillaumeGomez/sysinfo/1052
+sysinfo = { git = "https://github.com/rustdesk-org/sysinfo", optional = true }
 
 [target.'cfg(windows)'.dependencies.windows]
 version = "0.48"
